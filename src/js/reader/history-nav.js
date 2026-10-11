@@ -43,20 +43,29 @@ export class HistoryNavigation {
     window.addEventListener('popstate', (e) => {
       if (this.isNavigatingBack) return;
 
-      const state = e.state;
-      if (state && state.noteId) {
-        // Find if this note exists in our stack to restore previous scroll
+      const hash = window.location.hash || '';
+
+      // If user navigated back/forward to a note, stay in reader and load that note
+      if (hash.startsWith('#/note/')) {
+        const encoded = hash.replace('#/note/', '');
+        const [noteIdPart, anchorPart] = encoded.split('#');
+        const noteId = decodeURIComponent(noteIdPart);
+
+        // Check if this was a popped hop from our stack to restore exact scroll
         const lastEntry = this.pop();
-        if (lastEntry && lastEntry.noteId === state.noteId) {
-          this.loadTarget(lastEntry.noteId, { restoreScrollY: lastEntry.scrollY, anchor: lastEntry.anchor });
+        if (lastEntry && lastEntry.noteId === noteId) {
+          this.loadTarget(lastEntry.noteId, { restoreScrollY: lastEntry.scrollY, anchor: lastEntry.anchor || anchorPart });
         } else {
-          this.loadTarget(state.noteId, { restoreScrollY: 0, anchor: state.anchor });
+          const state = e.state;
+          const targetNoteId = (state && state.noteId) ? state.noteId : noteId;
+          this.loadTarget(targetNoteId, { restoreScrollY: 0, anchor: anchorPart });
         }
-      } else {
-        // Return to Library
-        this.clear();
-        this.onReturnToLibrary();
+        return;
       }
+
+      // Only return to Library if the user specifically navigated back to the root or library
+      this.clear();
+      this.onReturnToLibrary();
     });
   }
 

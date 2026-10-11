@@ -44,8 +44,8 @@ class GateNotesApp {
   }
 
   /**
-   * Retrieves passphrase from URL query param ?key=gate or localStorage.
-   * @returns {string | null}
+   * Retrieves passphrase from URL query param ?key=gate, localStorage, or defaults to 'gate'.
+   * @returns {string}
    */
   getInitialPassphrase() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -54,7 +54,7 @@ class GateNotesApp {
       ProgressStore.setPassphrase(queryKey, true);
       return queryKey;
     }
-    return ProgressStore.getPassphrase();
+    return ProgressStore.getPassphrase() || 'gate';
   }
 
   /**
@@ -397,8 +397,9 @@ class GateNotesApp {
    */
   async openNote(noteId) {
     this.historyNav.clear(); // Fresh navigation from library
+    const targetUrl = `#/note/${encodeURIComponent(noteId)}`;
+    window.history.pushState({ noteId }, '', targetUrl);
     await this.historyNav.loadTarget(noteId, { restoreScrollY: 0 });
-    window.location.hash = `#/note/${encodeURIComponent(noteId)}`;
   }
 
   /**
@@ -521,7 +522,9 @@ class GateNotesApp {
   showLibraryView() {
     this.viewReaderEl.classList.remove('active');
     this.viewLibraryEl.classList.add('active');
-    window.location.hash = '#/';
+    if (window.location.hash !== '#/' && window.location.hash !== '') {
+      window.history.replaceState({}, '', '#/');
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
 
     if (this.syllabusTree) {
