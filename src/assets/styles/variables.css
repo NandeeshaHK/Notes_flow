@@ -1,59 +1,116 @@
 :root {
-  /* Light Sepia Theme (Warm Parchment / Espresso) */
-  --bg-color-light: #F4EFE6;
-  --bg-card-light: #ECE5DA;
-  --text-main-light: #3E2723;
-  --text-muted-light: #6D4C41;
-  --border-color-light: #D7CCC8;
-  --accent-color-light: #8D6E63;
-  --hud-bg-light: rgba(244, 239, 230, 0.95);
+  /* =========================================================================
+     THEME: Academic Dark Slate (Default for intense late-night revision)
+     ========================================================================= */
+  --bg-color-dark: #090d16;
+  --bg-surface-dark: #111827;
+  --bg-card-dark: #1e293b;
+  --bg-card-hover-dark: #273549;
+  --text-main-dark: #f1f5f9;
+  --text-muted-dark: #94a3b8;
+  --text-dim-dark: #64748b;
+  --border-color-dark: #334155;
+  --border-light-dark: #1e293b;
+  --accent-color-dark: #38bdf8;
+  --accent-glow-dark: rgba(56, 189, 248, 0.2);
+  --success-color-dark: #22c55e;
+  --warning-color-dark: #f59e0b;
+  --code-bg-dark: #0f172a;
 
-  /* Dark Mocha Theme (Deep Mocha / Latte) */
-  --bg-color-dark: #231B18;
-  --bg-card-dark: #2E2420;
-  --text-main-dark: #EADCD3;
-  --text-muted-dark: #BCAAA4;
-  --border-color-dark: #4E342E;
-  --accent-color-dark: #A1887F;
-  --hud-bg-dark: rgba(35, 27, 24, 0.95);
+  /* =========================================================================
+     THEME: Warm Engineering Parchment (Eye-friendly sepia for daylight study)
+     ========================================================================= */
+  --bg-color-parchment: #f6f1e8;
+  --bg-surface-parchment: #ece4d5;
+  --bg-card-parchment: #f0e9dc;
+  --bg-card-hover-parchment: #e5dcce;
+  --text-main-parchment: #29221d;
+  --text-muted-parchment: #68574c;
+  --text-dim-parchment: #8c7668;
+  --border-color-parchment: #d9cec1;
+  --border-light-parchment: #e4dacf;
+  --accent-color-parchment: #9a5b32;
+  --accent-glow-parchment: rgba(154, 91, 50, 0.15);
+  --success-color-parchment: #2e7d32;
+  --warning-color-parchment: #b45309;
+  --code-bg-parchment: #e8dfd0;
 
-  /* Default active variables (mapped dynamically by data-theme) */
-  --bg-color: var(--bg-color-light);
-  --bg-card: var(--bg-card-light);
-  --text-main: var(--text-main-light);
-  --text-muted: var(--text-muted-light);
-  --border-color: var(--border-color-light);
-  --accent-color: var(--accent-color-light);
-  --hud-bg: var(--hud-bg-light);
+  /* =========================================================================
+     THEME: Crisp Modern Light
+     ========================================================================= */
+  --bg-color-light: #f8fafc;
+  --bg-surface-light: #ffffff;
+  --bg-card-light: #ffffff;
+  --bg-card-hover-light: #f1f5f9;
+  --text-main-light: #0f172a;
+  --text-muted-light: #475569;
+  --text-dim-light: #94a3b8;
+  --border-color-light: #e2e8f0;
+  --border-light-light: #f1f5f9;
+  --accent-color-light: #0284c7;
+  --accent-glow-light: rgba(2, 132, 199, 0.15);
+  --success-color-light: #16a34a;
+  --warning-color-light: #d97706;
+  --code-bg-light: #f1f5f9;
 
-  /* Typography scale with Sans-serif Monospace & universal Kannada support */
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Nirmala UI", "Tunga", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-reader: ui-monospace, "Cascadia Code", "SF Mono", "Roboto Mono", "Consolas", "Nirmala UI", "Segoe UI", monospace, sans-serif;
-  --font-serif: var(--font-reader);
-  
-  --font-size-sm: 1.1rem;   /* 17.6px */
-  --font-size-md: 1.35rem;  /* 21.6px - Default elder-friendly */
-  --font-size-lg: 1.65rem;  /* 26.4px */
-  --font-size-xl: 2.0rem;   /* 32px */
-  --font-size-xxl: 2.4rem;  /* 38.4px */
-
-  --font-size-current: var(--font-size-md);
-  --line-height: 1.65;
-  --letter-spacing: 0.015em;
-
-  /* Safe Area Insets for modern devices with notches/bars */
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sal: env(safe-area-inset-left, 0px);
-  --sar: env(safe-area-inset-right, 0px);
-}
-
-[data-theme="dark"] {
+  /* Default Active (Dark Slate) */
   --bg-color: var(--bg-color-dark);
+  --bg-surface: var(--bg-surface-dark);
   --bg-card: var(--bg-card-dark);
+  --bg-card-hover: var(--bg-card-hover-dark);
   --text-main: var(--text-main-dark);
   --text-muted: var(--text-muted-dark);
+  --text-dim: var(--text-dim-dark);
   --border-color: var(--border-color-dark);
+  --border-light: var(--border-light-dark);
   --accent-color: var(--accent-color-dark);
-  --hud-bg: var(--hud-bg-dark);
+  --accent-glow: var(--accent-glow-dark);
+  --success-color: var(--success-color-dark);
+  --warning-color: var(--warning-color-dark);
+  --code-bg: var(--code-bg-dark);
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --reader-font-size: 18px;
+  --reader-line-height: 1.7;
+
+  /* Layout */
+  --max-reader-width: 860px;
+  --max-app-width: 1180px;
+  --header-height: 60px;
+}
+
+[data-theme="parchment"] {
+  --bg-color: var(--bg-color-parchment);
+  --bg-surface: var(--bg-surface-parchment);
+  --bg-card: var(--bg-card-parchment);
+  --bg-card-hover: var(--bg-card-hover-parchment);
+  --text-main: var(--text-main-parchment);
+  --text-muted: var(--text-muted-parchment);
+  --text-dim: var(--text-dim-parchment);
+  --border-color: var(--border-color-parchment);
+  --border-light: var(--border-light-parchment);
+  --accent-color: var(--accent-color-parchment);
+  --accent-glow: var(--accent-glow-parchment);
+  --success-color: var(--success-color-parchment);
+  --warning-color: var(--warning-color-parchment);
+  --code-bg: var(--code-bg-parchment);
+}
+
+[data-theme="light"] {
+  --bg-color: var(--bg-color-light);
+  --bg-surface: var(--bg-surface-light);
+  --bg-card: var(--bg-card-light);
+  --bg-card-hover: var(--bg-card-hover-light);
+  --text-main: var(--text-main-light);
+  --text-muted: var(--text-muted-light);
+  --text-dim: var(--text-dim-light);
+  --border-color: var(--border-color-light);
+  --border-light: var(--border-light-light);
+  --accent-color: var(--accent-color-light);
+  --accent-glow: var(--accent-glow-light);
+  --success-color: var(--success-color-light);
+  --warning-color: var(--warning-color-light);
+  --code-bg: var(--code-bg-light);
 }

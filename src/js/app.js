@@ -1,362 +1,551 @@
-import { decryptEncPayload, verifyAndDecryptCatalog } from './crypto/decryptor.js';
-import { Store } from './storage/store.js';
-import { SettingsManager } from './ui/settings.js';
-import { LibraryView } from './ui/library.js';
-import { Router } from './ui/router.js';
-import { VirtualCarousel } from './reader/carousel.js';
-import { TocDrawer } from './reader/toc.js';
-import { WakeLockManager } from './reader/wakelock.js';
-import { FullscreenManager } from './ui/fullscreen.js';
-import { HapticUX } from './ui/haptics.js';
-import { createIcons, icons } from 'lucide';
-
 /**
- * Main Application Controller for Timepass Tea
+ * @file app.js
+ * @description Master Application Controller for GATE Notes Flow.
+ * Coordinates catalog loading, syllabus tree rendering, scroll reader,
+ * markdown link hopping with exact scroll restoration, formula drawer,
+ * and version diff change notifications.
  */
-class App {
+
+import 'katex/dist/katex.min.css';
+import { decryptEncPayload, verifyAndDecryptCatalog } from './crypto/decryptor.js';
+import { ProgressStore } from './storage/progress-store.js';
+import { SyllabusTree } from './navigation/syllabus-tree.js';
+import { ScrollReader } from './reader/scroll-reader.js';
+import { HistoryNavigation } from './reader/history-nav.js';
+import { FormulaDrawer } from './reader/formula-drawer.js';
+import { NotificationManager } from './ui/notifications.js';
+import { LinkResolver } from './parser/link-resolver.js';
+
+class GateNotesApp {
   constructor() {
-    /** @type {Array<{ id: string, title: string, author: string, synopsis: string, totalChunks: number, estimatedMinutes: number }>} */
-    this.catalog = [];
-    this.passphrase = Store.getPassphrase();
+    /** @type {any} */
+    this.catalog = null;
     /** @type {string | null} */
-    this.currentStoryId = null;
-    /** @type {Object | null} */
-    this.currentStoryMeta = null;
-    /** @type {Array<{ title: string, level: number, chunkIndex: number }>} */
-    this.currentToc = [];
+    this.currentNoteId = null;
+    /** @type {any | null} */
+    this.currentNoteMeta = null;
+    /** @type {string | null} */
+    this.passphrase = this.getInitialPassphrase();
 
-    // UI Elements
-    this.libraryViewEl = /** @type {HTMLElement} */ (document.getElementById('view-library'));
-    this.readerViewEl = /** @type {HTMLElement} */ (document.getElementById('view-reader'));
-    this.hudContainerEl = /** @type {HTMLElement} */ (document.getElementById('hud-container'));
-    this.passphraseModal = /** @type {HTMLElement} */ (document.getElementById('passphrase-modal'));
-    this.passphraseInput = /** @type {HTMLInputElement} */ (document.getElementById('passphrase-input'));
-    this.passphraseSubmitBtn = /** @type {HTMLButtonElement} */ (document.getElementById('btn-submit-passphrase'));
-    this.passphraseError = /** @type {HTMLElement} */ (document.getElementById('passphrase-error'));
-    this.storyTitleHeader = /** @type {HTMLElement} */ (document.getElementById('story-header-title'));
-    this.pageProgressText = /** @type {HTMLElement} */ (document.getElementById('page-progress-text'));
-    this.progressSlider = /** @type {HTMLInputElement} */ (document.getElementById('progress-slider'));
+    // View Elements
+    this.viewLibraryEl = /** @type {HTMLElement} */ (document.getElementById('view-library'));
+    this.viewReaderEl = /** @type {HTMLElement} */ (document.getElementById('view-reader'));
+    this.passphraseModalEl = /** @type {HTMLElement} */ (document.getElementById('passphrase-modal'));
+    this.toastEl = /** @type {HTMLElement} */ (document.getElementById('app-toast'));
+    this.toastTimer = null;
 
-    // Sub-systems
-    this.fullscreen = new FullscreenManager({
-      onChange: (active) => this.handleFullscreenChange(active)
+    // Initialize UI theme & font size
+    const initialTheme = ProgressStore.getTheme();
+    ProgressStore.setTheme(initialTheme);
+    const initialFontSize = ProgressStore.getFontSize();
+    ProgressStore.setFontSize(initialFontSize);
+
+    this.initControllers();
+  }
+
+  /**
+   * Retrieves passphrase from URL query param ?key=gate or localStorage.
+   * @returns {string | null}
+   */
+  getInitialPassphrase() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryKey = urlParams.get('key');
+    if (queryKey) {
+      ProgressStore.setPassphrase(queryKey, true);
+      return queryKey;
+    }
+    return ProgressStore.getPassphrase();
+  }
+
+  /**
+   * Initializes sub-controllers and event listeners.
+   */
+  async initControllers() {
+    // 1. Toast Helper
+    this.showToast = (msg) => {
+      if (!this.toastEl) return;
+      this.toastEl.textContent = msg;
+      this.toastEl.classList.add('visible');
+      clearTimeout(this.toastTimer);
+      this.toastTimer = setTimeout(() => {
+        this.toastEl.classList.remove('visible');
+      }, 2600);
+    };
+
+    // 2. Formula Drawer
+    this.formulaDrawer = new FormulaDrawer({
+      drawerEl: /** @type {HTMLElement} */ (document.getElementById('formula-drawer')),
+      contentEl: /** @type {HTMLElement} */ (document.getElementById('formula-drawer-content')),
+      overlayEl: /** @type {HTMLElement} */ (document.getElementById('modal-overlay')),
+      onToast: this.showToast
     });
 
-    this.settings = new SettingsManager({
-      onFontSizeChange: (label) => {
-        if (this.carousel) {
-          this.carousel.recalculatePages(false);
-          this.carousel.showToast(`Text Size: ${label}`);
+    // 3. Notifications Manager
+    this.notifications = new NotificationManager({
+      bannerEl: /** @type {HTMLElement} */ (document.getElementById('top-update-banner')),
+      modalEl: /** @type {HTMLElement} */ (document.getElementById('updates-modal')),
+      overlayEl: /** @type {HTMLElement} */ (document.getElementById('modal-overlay')),
+      onSelectNote: (noteId) => this.openNote(noteId)
+    });
+
+    // 4. History Navigation Stack with exact scroll restoration
+    this.historyNav = new HistoryNavigation({
+      onLoadNote: async (noteId, options) => {
+        await this.loadAndRenderNote(noteId, options);
+      },
+      onReturnToLibrary: () => {
+        this.showLibraryView();
+      },
+      onTrailChange: (trail) => {
+        if (this.scrollReader) {
+          this.scrollReader.renderTrail(trail, () => this.historyNav.goBack());
         }
       }
     });
 
-    this.library = new LibraryView({
-      onSelectStory: (id, chapterIdx, pageIdx) => this.openStory(id, chapterIdx, pageIdx)
-    });
-
-    this.toc = new TocDrawer({
-      onSelectChapter: (chapterIndex) => {
-        this.carousel.goToChapter(chapterIndex, 0);
-      }
-    });
-
-    this.router = new Router({
-      onNavigateToLibrary: () => this.showLibraryView(),
-      onNavigateToReader: (storyId) => this.openStory(storyId, 0, 0, false),
-      shouldInterceptBack: () => {
-        if (this.toc && this.toc.isOpen) {
-          this.toc.close();
-          return true;
-        }
-        return false;
-      }
-    });
-
-    this.carousel = new VirtualCarousel({
+    // 5. Scroll Reader Engine
+    this.scrollReader = new ScrollReader({
       viewportEl: /** @type {HTMLElement} */ (document.getElementById('reader-viewport')),
-      trackEl: /** @type {HTMLElement} */ (document.getElementById('reader-track')),
-      measurerEl: /** @type {HTMLElement} */ (document.getElementById('reader-measurer')),
-      toastEl: /** @type {HTMLElement} */ (document.getElementById('reader-toast')),
-      fetchAndDecryptChunk: (index) => this.fetchStoryChunk(index),
-      onPageChange: (chapterIdx, totalChapters, pageIdx, totalPages) =>
-        this.onPageChange(chapterIdx, totalChapters, pageIdx, totalPages),
-      onToggleHUD: () => this.toggleHUD()
+      contentEl: /** @type {HTMLElement} */ (document.getElementById('reader-content')),
+      progressBarEl: /** @type {HTMLElement} */ (document.getElementById('reader-progress-fill')),
+      headerTitleEl: /** @type {HTMLElement} */ (document.getElementById('reader-header-title')),
+      headerVersionEl: /** @type {HTMLElement} */ (document.getElementById('reader-header-version')),
+      btnMarkReadEl: /** @type {HTMLElement} */ (document.getElementById('btn-mark-read')),
+      btnBookmarkEl: /** @type {HTMLElement} */ (document.getElementById('btn-reader-bookmark')),
+      trailContainerEl: /** @type {HTMLElement} */ (document.getElementById('reader-nav-trail')),
+      inNoteAlertContainerEl: /** @type {HTMLElement} */ (document.getElementById('in-note-alert-container')),
+      onHopLink: (targetNoteId, anchor) => {
+        const canonical = LinkResolver.findInCatalog(targetNoteId, this.catalog?.notes || []);
+        if (canonical) {
+          this.historyNav.hopToNote(canonical, anchor);
+        } else {
+          this.showToast(`Note reference not found: ${targetNoteId}`);
+        }
+      },
+      onReadStatusChanged: () => {
+        if (this.syllabusTree) {
+          this.syllabusTree.render();
+        }
+        if (this.catalog) {
+          this.notifications.checkForUpdates(this.catalog.notes);
+        }
+      },
+      onOpenFormulaDrawer: () => {
+        if (this.currentNoteMeta) {
+          this.formulaDrawer.populateFromReader(
+            /** @type {HTMLElement} */ (document.getElementById('reader-content')),
+            this.currentNoteMeta.title
+          );
+          this.formulaDrawer.open();
+        }
+      },
+      onToast: this.showToast
     });
 
-    this.initEventListeners();
-    this.bootstrap();
+    // Load Note Catalog
+    await this.fetchCatalog();
+    this.initGlobalEvents();
+    this.handleInitialRoute();
   }
 
   /**
-   * Initializes top-level UI event listeners.
+   * Fetches catalog (supports both encrypted catalog.json.enc and catalog.json).
    */
-  initEventListeners() {
-    // Passphrase submission
-    this.passphraseSubmitBtn.addEventListener('click', () => this.handlePassphraseSubmit());
-    this.passphraseInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') this.handlePassphraseSubmit();
-    });
+  async fetchCatalog() {
+    try {
+      // 1. Check if encrypted catalog exists first
+      const encRes = await fetch('catalog.json.enc');
+      if (encRes.ok) {
+        const encBuffer = await encRes.arrayBuffer();
 
-    // Reader UI buttons: Exit to Library
-    const btnBack = document.getElementById('btn-back-to-library');
-    if (btnBack) {
-      btnBack.addEventListener('click', () => {
-        HapticUX.backTrigger();
-        this.router.goToLibrary();
+        if (this.passphrase) {
+          try {
+            this.catalog = await verifyAndDecryptCatalog(encBuffer, this.passphrase);
+            this.initSyllabusAfterCatalog();
+            return;
+          } catch {
+            console.warn('Saved passphrase invalid or changed.');
+            this.passphrase = null;
+          }
+        }
+
+        // Show Passphrase Modal
+        this.showPassphraseModal(encBuffer);
+        return;
+      }
+
+      // 2. Unencrypted fallback
+      const res = await fetch('catalog.json');
+      if (!res.ok) throw new Error('Catalog fetch failed');
+      this.catalog = await res.json();
+      this.initSyllabusAfterCatalog();
+    } catch (err) {
+      console.error('Failed to load catalog:', err);
+      this.showToast('Could not load GATE notes catalog.');
+    }
+  }
+
+  /**
+   * Shows Passphrase unlock modal.
+   * @param {ArrayBuffer} encBuffer
+   */
+  showPassphraseModal(encBuffer) {
+    if (!this.passphraseModalEl) return;
+    this.passphraseModalEl.classList.add('visible');
+
+    const input = /** @type {HTMLInputElement} */ (document.getElementById('passphrase-input'));
+    const btnSubmit = /** @type {HTMLButtonElement} */ (document.getElementById('btn-submit-passphrase'));
+    const errorEl = document.getElementById('passphrase-error');
+
+    if (input) {
+      input.focus();
+    }
+
+    const handleUnlock = async () => {
+      const enteredKey = input?.value?.trim();
+      if (!enteredKey) return;
+
+      if (btnSubmit) btnSubmit.disabled = true;
+      if (errorEl) errorEl.textContent = '';
+
+      try {
+        this.catalog = await verifyAndDecryptCatalog(encBuffer, enteredKey);
+        this.passphrase = enteredKey;
+        ProgressStore.setPassphrase(enteredKey, true);
+        this.passphraseModalEl.classList.remove('visible');
+        this.initSyllabusAfterCatalog();
+        this.showToast('GATE Notes Unlocked Successfully!');
+      } catch (err) {
+        if (errorEl) {
+          errorEl.textContent = 'Incorrect key. Please enter the valid access key (Key: gate).';
+        }
+      } finally {
+        if (btnSubmit) btnSubmit.disabled = false;
+      }
+    };
+
+    btnSubmit?.addEventListener('click', handleUnlock);
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleUnlock();
+    });
+  }
+
+  /**
+   * Initializes syllabus tree and notifications once catalog is decrypted.
+   */
+  initSyllabusAfterCatalog() {
+    if (!this.catalog) return;
+
+    this.syllabusTree = new SyllabusTree({
+      containerEl: /** @type {HTMLElement} */ (document.getElementById('syllabus-container')),
+      progressSummaryEl: /** @type {HTMLElement} */ (document.getElementById('syllabus-progress-summary')),
+      streams: this.catalog.streams,
+      notes: this.catalog.notes,
+      onSelectNote: (noteId) => this.openNote(noteId),
+      onToggleBookmark: () => {
+        if (this.syllabusTree) this.syllabusTree.render();
+      }
+    });
+    this.syllabusTree.render();
+
+    // Check if any completed notes were updated in catalog!
+    this.notifications.checkForUpdates(this.catalog.notes);
+  }
+
+  /**
+   * Sets up global app header, theme switchers, and keyboard navigation.
+   */
+  initGlobalEvents() {
+    // 1. Back to Library Button in reader header
+    const btnBackToLib = document.getElementById('btn-back-library');
+    if (btnBackToLib) {
+      btnBackToLib.addEventListener('click', () => {
+        if (this.historyNav.canGoBack()) {
+          this.historyNav.goBack();
+        } else {
+          this.showLibraryView();
+        }
       });
     }
 
-    // Toggle Chapters Drawer
-    const btnOpenToc = document.getElementById('btn-open-toc');
-    if (btnOpenToc) {
-      btnOpenToc.addEventListener('click', () => this.toc.toggle());
-    }
+    // 2. Stream Switcher Tabs in Library View
+    const streamTabs = document.querySelectorAll('.stream-tab-btn');
+    streamTabs.forEach((tab) => {
+      tab.addEventListener('click', (e) => {
+        const target = /** @type {HTMLElement} */ (e.currentTarget);
+        const streamKey = target.getAttribute('data-stream') || 'GATE_CS';
+        streamTabs.forEach(t => t.classList.remove('active'));
+        target.classList.add('active');
+        if (this.syllabusTree) {
+          this.syllabusTree.setStream(streamKey);
+        }
+      });
+    });
 
-    // Fullscreen Toggle Button
-    const btnFullscreen = document.getElementById('btn-fullscreen');
-    if (btnFullscreen) {
-      btnFullscreen.addEventListener('click', () => {
-        HapticUX.buttonTap();
-        this.fullscreen.toggle();
+    // 3. Filter Pills in Library View (All, Unread, Completed, Updated, Starred)
+    const filterPills = document.querySelectorAll('.filter-pill-btn');
+    filterPills.forEach((pill) => {
+      pill.addEventListener('click', (e) => {
+        const target = /** @type {HTMLElement} */ (e.currentTarget);
+        const filterVal = target.getAttribute('data-filter') || 'ALL';
+        filterPills.forEach(p => p.classList.remove('active'));
+        target.classList.add('active');
+        if (this.syllabusTree) {
+          this.syllabusTree.setFilter(filterVal);
+        }
+      });
+    });
+
+    // 4. Instant Search Input
+    const searchInput = /** @type {HTMLInputElement} */ (document.getElementById('syllabus-search-input'));
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = /** @type {HTMLInputElement} */ (e.target).value;
+        if (this.syllabusTree) {
+          this.syllabusTree.setSearchQuery(query);
+        }
       });
     }
 
-    // Progress slider scrub with debouncing so rapid dragging doesn't flood rendering
-    let sliderDebounceTimer = null;
-    this.progressSlider.addEventListener('input', (e) => {
-      HapticUX.sliderTick();
-      const targetInput = /** @type {HTMLInputElement} */ (e.target);
-      const targetChapter = parseInt(targetInput.value, 10);
-      this.pageProgressText.textContent = `Chapter ${targetChapter + 1} of ${this.currentStoryMeta?.totalChunks || 1}`;
-      clearTimeout(sliderDebounceTimer);
-      sliderDebounceTimer = setTimeout(() => {
-        this.carousel.goToChapter(targetChapter, 0);
-      }, 60);
-    });
+    // 5. Formula Drawer Toggle Button in reader header
+    const btnFormulaToggle = document.getElementById('btn-toggle-formula-drawer');
+    if (btnFormulaToggle) {
+      btnFormulaToggle.addEventListener('click', () => {
+        if (this.currentNoteMeta) {
+          this.formulaDrawer.populateFromReader(
+            /** @type {HTMLElement} */ (document.getElementById('reader-content')),
+            this.currentNoteMeta.title
+          );
+          this.formulaDrawer.open();
+        }
+      });
+    }
 
-    // WakeLock Visibility listener
-    WakeLockManager.initVisibilityListener(() => this.readerViewEl.classList.contains('active'));
+    // 6. Font Size Adjusters
+    const btnFontDown = document.getElementById('btn-font-smaller');
+    const btnFontUp = document.getElementById('btn-font-larger');
+    if (btnFontDown && btnFontUp) {
+      btnFontDown.addEventListener('click', () => {
+        const current = ProgressStore.getFontSize();
+        const next = Math.max(14, current - 2);
+        ProgressStore.setFontSize(next);
+        this.showToast(`Font Size: ${next}px`);
+      });
+      btnFontUp.addEventListener('click', () => {
+        const current = ProgressStore.getFontSize();
+        const next = Math.min(26, current + 2);
+        ProgressStore.setFontSize(next);
+        this.showToast(`Font Size: ${next}px`);
+      });
+    }
 
-    // Disable standard text copy & context menu to preserve serene distraction-free reading
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    // 7. Theme Toggle Button
+    const btnThemeToggle = document.getElementById('btn-theme-toggle');
+    if (btnThemeToggle) {
+      btnThemeToggle.addEventListener('click', () => {
+        const themes = ['dark', 'parchment', 'light'];
+        const currentTheme = ProgressStore.getTheme();
+        const nextIdx = (themes.indexOf(currentTheme) + 1) % themes.length;
+        const nextTheme = themes[nextIdx];
+        ProgressStore.setTheme(nextTheme);
+        this.showToast(`Theme: ${nextTheme.toUpperCase()}`);
+      });
+    }
 
-    // Global Keyboard shortcuts & exit mechanisms
+    // 8. Next / Previous Note Buttons at footer of reader
+    const btnPrevTopic = document.getElementById('btn-prev-topic');
+    const btnNextTopic = document.getElementById('btn-next-topic');
+    if (btnPrevTopic && btnNextTopic) {
+      btnPrevTopic.addEventListener('click', () => this.navigateAdjacentTopic(-1));
+      btnNextTopic.addEventListener('click', () => this.navigateAdjacentTopic(1));
+    }
+
+    // 9. Global Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
+      // Escape closes formula drawer or goes back
       if (e.key === 'Escape') {
-        if (this.toc && this.toc.isOpen) {
-          this.toc.close();
-        } else if (this.hudContainerEl.classList.contains('hud-visible')) {
-          this.hideHUD();
-        } else if (this.readerViewEl.classList.contains('active')) {
-          HapticUX.backTrigger();
-          this.router.goToLibrary();
+        if (this.formulaDrawer.isOpen) {
+          this.formulaDrawer.close();
+        } else if (this.viewReaderEl.classList.contains('active')) {
+          if (this.historyNav.canGoBack()) {
+            this.historyNav.goBack();
+          } else {
+            this.showLibraryView();
+          }
         }
       }
 
-      if ((e.ctrlKey || e.metaKey) && ['c', 'p', 's', 'u'].includes(e.key.toLowerCase())) {
+      // Alt + Left Arrow for back navigation
+      if (e.altKey && e.key === 'ArrowLeft') {
         e.preventDefault();
+        this.historyNav.goBack();
+      }
+
+      // Ctrl + K focus search
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        this.showLibraryView();
+        searchInput?.focus();
       }
     });
   }
 
   /**
-   * Handles fullscreen state change to update HUD icons and reflow reader.
-   * @param {boolean} active
+   * Opens a note from the library or search.
+   *
+   * @param {string} noteId
    */
-  handleFullscreenChange(active) {
-    const iconEl = document.getElementById('icon-fullscreen');
-    if (iconEl) {
-      iconEl.setAttribute('data-lucide', active ? 'minimize' : 'maximize');
-      createIcons({ icons });
-    }
-    if (this.carousel) {
-      this.carousel.showToast(active ? 'Fullscreen Mode' : 'Standard View');
-      this.carousel.recalculatePages(false);
-    }
-  }
-
-  toggleHUD() {
-    this.hudContainerEl.classList.toggle('hud-visible');
-  }
-
-  hideHUD() {
-    this.hudContainerEl.classList.remove('hud-visible');
-  }
-
-  async bootstrap() {
-    createIcons({ icons });
-
-    if (!this.passphrase) {
-      this.showPassphraseModal();
-    } else {
-      await this.loadCatalog(this.passphrase);
-    }
-  }
-
-  showPassphraseModal() {
-    this.passphraseModal.style.display = 'flex';
-    this.passphraseInput.focus();
-  }
-
-  async handlePassphraseSubmit() {
-    const inputPass = this.passphraseInput.value.trim();
-    if (!inputPass) return;
-
-    this.passphraseError.style.display = 'none';
-    this.passphraseSubmitBtn.disabled = true;
-
-    try {
-      await this.loadCatalog(inputPass);
-      this.passphrase = inputPass;
-      Store.setPassphrase(inputPass, true);
-      HapticUX.selected();
-      this.passphraseModal.style.display = 'none';
-    } catch (err) {
-      HapticUX.pageEnd();
-      this.passphraseError.textContent = 'Incorrect passphrase or unable to decrypt catalog.';
-      this.passphraseError.style.display = 'block';
-    } finally {
-      this.passphraseSubmitBtn.disabled = false;
-    }
+  async openNote(noteId) {
+    this.historyNav.clear(); // Fresh navigation from library
+    await this.historyNav.loadTarget(noteId, { restoreScrollY: 0 });
+    window.location.hash = `#/note/${encodeURIComponent(noteId)}`;
   }
 
   /**
-   * Fetches and decrypts story catalog.
-   * @param {string} passphrase
+   * Fetches raw markdown and renders the note.
+   *
+   * @param {string} noteId - Canonical note ID.
+   * @param {{ restoreScrollY?: number, anchor?: string }} options
    */
-  async loadCatalog(passphrase) {
-    const res = await fetch('catalog.json.enc');
-    if (!res.ok) {
-      throw new Error('Catalog file not found. Ensure stories are encrypted.');
-    }
-    const buffer = await res.arrayBuffer();
-    this.catalog = await verifyAndDecryptCatalog(buffer, passphrase);
-    this.library.render(this.catalog);
-  }
-
-  /**
-   * Opens story at specified chapter and page.
-   * @param {string} storyId
-   * @param {number} [startChapterIndex=0]
-   * @param {number} [startPageIndex=0]
-   * @param {boolean} [updateHistory=true]
-   */
-  async openStory(storyId, startChapterIndex = 0, startPageIndex = 0, updateHistory = true) {
-    this.currentStoryId = storyId;
-    this.currentStoryMeta = this.catalog.find(s => s.id === storyId);
-
-    if (!this.currentStoryMeta) {
-      console.error('Story not found in catalog:', storyId);
+  async loadAndRenderNote(noteId, options = {}) {
+    const meta = this.catalog?.notes.find((n) => n.id === noteId);
+    if (!meta) {
+      this.showToast(`Note not found: ${noteId}`);
       return;
     }
 
-    if (updateHistory) {
-      this.router.goToReader(storyId);
-    }
+    this.currentNoteId = noteId;
+    this.currentNoteMeta = meta;
+    this.historyNav.setCurrentNote(noteId, meta.title);
 
-    this.storyTitleHeader.textContent = this.currentStoryMeta.title;
-    this.libraryViewEl.classList.remove('active');
-    this.readerViewEl.classList.add('active');
-    this.hideHUD();
+    // Switch view to Reader
+    this.viewLibraryEl.classList.remove('active');
+    this.viewReaderEl.classList.add('active');
 
-    // Fetch and decrypt Table of Contents
-    await this.fetchToc(storyId);
-
-    // Initialize progress slider bounds for chapters
-    this.progressSlider.max = Math.max(0, this.currentStoryMeta.totalChunks - 1).toString();
-    this.progressSlider.value = startChapterIndex.toString();
-
-    // Request Wake Lock & enter Fullscreen mode
-    WakeLockManager.request();
-    this.fullscreen.enter();
-
-    // Load into dynamic single-page carousel reader
-    await this.carousel.loadStory(this.currentStoryMeta.totalChunks, startChapterIndex, startPageIndex);
-  }
-
-  /**
-   * Fetches and decrypts Table of Contents for the story.
-   * @param {string} storyId
-   */
-  async fetchToc(storyId) {
+    // Fetch markdown file from public/notes (supports .enc and .md)
     try {
-      const res = await fetch(`stories/${storyId}/toc.json.enc`);
-      if (res.ok) {
-        const buffer = await res.arrayBuffer();
-        const json = await decryptEncPayload(buffer, this.passphrase);
-        this.currentToc = JSON.parse(json);
-      } else {
-        this.currentToc = [];
+      let markdown = '';
+      if (this.passphrase) {
+        const encPath = `notes/${meta.relativePath.replace(/\.md$/i, '.enc')}`;
+        const encRes = await fetch(encPath);
+        if (encRes.ok) {
+          const encBuffer = await encRes.arrayBuffer();
+          markdown = await decryptEncPayload(encBuffer, this.passphrase);
+        }
       }
+
+      if (!markdown) {
+        const res = await fetch(`notes/${meta.relativePath}`);
+        if (!res.ok) throw new Error('Markdown file fetch failed');
+        markdown = await res.text();
+      }
+
+      // Render through ScrollReader
+      this.scrollReader.renderNote(markdown, meta);
+
+      // Check if this note was updated since the user last completed it
+      const inNoteAlertEl = document.getElementById('in-note-alert-container');
+      if (inNoteAlertEl) {
+        inNoteAlertEl.innerHTML = '';
+        const updateBanner = this.notifications.createInNoteBanner(noteId, meta.version, () => {
+          this.showToast(`Version ${meta.version} acknowledged as reviewed!`);
+          if (this.syllabusTree) this.syllabusTree.render();
+          this.notifications.checkForUpdates(this.catalog.notes);
+        });
+        if (updateBanner) {
+          inNoteAlertEl.appendChild(updateBanner);
+        }
+      }
+
+      // Save Last Read pointer
+      ProgressStore.setLastRead({
+        noteId: meta.id,
+        title: meta.title,
+        stream: meta.stream,
+        scrollY: options.restoreScrollY || 0,
+        timestamp: Date.now()
+      });
+
+      // Update adjacent topic buttons
+      this.updateAdjacentButtons(noteId);
     } catch (err) {
-      console.warn('Failed to load ToC:', err);
-      this.currentToc = [];
+      console.error('Error loading note markdown:', err);
+      this.showToast('Failed to load note content.');
     }
-    this.toc.render(this.currentToc, 0);
   }
 
   /**
-   * Fetches and decrypts a specific chapter chunk.
-   * @param {number} chapterIndex
-   * @returns {Promise<string>}
+   * Navigates to the adjacent (previous or next) topic in the active stream.
+   * @param {number} direction - -1 for previous, 1 for next.
    */
-  async fetchStoryChunk(chapterIndex) {
-    if (!this.currentStoryId) return '';
-    try {
-      const res = await fetch(`stories/${this.currentStoryId}/chunk-${chapterIndex}.enc`);
-      if (!res.ok) return '';
-      const buffer = await res.arrayBuffer();
-      return await decryptEncPayload(buffer, this.passphrase);
-    } catch (err) {
-      console.error(`Failed to decrypt chapter ${chapterIndex}:`, err);
-      return '<p style="color:#D32F2F;">[Error decrypting page content]</p>';
+  navigateAdjacentTopic(direction) {
+    if (!this.catalog || !this.currentNoteId) return;
+
+    const currentIdx = this.catalog.notes.findIndex((n) => n.id === this.currentNoteId);
+    if (currentIdx < 0) return;
+
+    const targetIdx = currentIdx + direction;
+    if (targetIdx >= 0 && targetIdx < this.catalog.notes.length) {
+      const target = this.catalog.notes[targetIdx];
+      this.historyNav.hopToNote(target.id);
     }
   }
 
   /**
-   * Handles progress update from reader engine.
-   * @param {number} chapterIndex
-   * @param {number} totalChapters
-   * @param {number} pageIndex
-   * @param {number} totalPages
+   * Updates previous/next button labels and disabled states.
+   * @param {string} noteId
    */
-  onPageChange(chapterIndex, totalChapters, pageIndex, totalPages) {
-    this.pageProgressText.textContent = `Ch. ${chapterIndex + 1}/${totalChapters} · Page ${pageIndex + 1}/${totalPages}`;
-    this.progressSlider.value = chapterIndex.toString();
+  updateAdjacentButtons(noteId) {
+    if (!this.catalog) return;
+    const currentIdx = this.catalog.notes.findIndex((n) => n.id === noteId);
+    const btnPrev = /** @type {HTMLButtonElement} */ (document.getElementById('btn-prev-topic'));
+    const btnNext = /** @type {HTMLButtonElement} */ (document.getElementById('btn-next-topic'));
 
-    // Save reading progress to localStorage
-    if (this.currentStoryId) {
-      Store.setStoryProgress(
-        this.currentStoryId,
-        chapterIndex,
-        pageIndex,
-        this.currentStoryMeta?.title || ''
-      );
+    if (btnPrev) {
+      btnPrev.disabled = currentIdx <= 0;
+      if (currentIdx > 0) {
+        btnPrev.title = `Previous: ${this.catalog.notes[currentIdx - 1].title}`;
+      }
     }
-
-    // Update active item in chapter drawer
-    this.toc.render(this.currentToc, chapterIndex);
+    if (btnNext) {
+      btnNext.disabled = currentIdx < 0 || currentIdx >= this.catalog.notes.length - 1;
+      if (currentIdx < this.catalog.notes.length - 1) {
+        btnNext.title = `Next: ${this.catalog.notes[currentIdx + 1].title}`;
+      }
+    }
   }
 
   /**
-   * Clean exit mechanism back to Library view.
+   * Switches to Library/Syllabus View.
    */
   showLibraryView() {
-    this.readerViewEl.classList.remove('active');
-    this.libraryViewEl.classList.add('active');
-    this.carousel.clear();
-    this.currentStoryId = null;
-    this.currentStoryMeta = null;
-    WakeLockManager.release();
-    this.fullscreen.exit();
-    this.toc.close();
-    this.hideHUD();
-    this.library.render(this.catalog);
+    this.viewReaderEl.classList.remove('active');
+    this.viewLibraryEl.classList.add('active');
+    window.location.hash = '#/';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    if (this.syllabusTree) {
+      this.syllabusTree.render();
+    }
+  }
+
+  /**
+   * Handles hash URL routing on initial page boot.
+   */
+  handleInitialRoute() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#/note/')) {
+      const encoded = hash.replace('#/note/', '');
+      const [noteIdPart, anchorPart] = encoded.split('#');
+      const noteId = decodeURIComponent(noteIdPart);
+      this.openNote(noteId);
+    } else {
+      this.showLibraryView();
+    }
   }
 }
 
-// Bootstrap on DOM ready
+// Bootstrap application on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-  new App();
+  new GateNotesApp();
 });

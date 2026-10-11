@@ -8,11 +8,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'favicon.svg', 'favicon-32x32.png', 'apple-touch-icon.png', 'logo.svg', 'icons/*.png', 'icons/*.svg'],
       manifest: {
-        name: 'Timepass Tea - Story Reader',
-        short_name: 'TimepassTea',
-        description: 'Distraction-free, accessible story reader designed for comfortable reading.',
-        theme_color: '#F4EFE6',
-        background_color: '#F4EFE6',
+        name: 'GATE Notes Flow - CS & DA Master Revision',
+        short_name: 'GATENotesFlow',
+        description: 'High-yield formula-ready revision notes for GATE CS & DA with smart navigation, version tracking, and active recall.',
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
         display: 'standalone',
         orientation: 'portrait',
         icons: [

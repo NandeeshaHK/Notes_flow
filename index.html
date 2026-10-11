@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Timepass Tea</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>GATE Notes Flow • CS & DA Master Revision</title>
   
-  <meta name="description" content="Distraction-free, accessible story reader designed for comfortable reading." />
-  <meta name="theme-color" content="#F4EFE6" />
+  <meta name="description" content="High-yield revision notes and formulas for GATE Computer Science (CS) and Data Science & AI (DA) with smart navigation, version tracking, and active recall." />
+  <meta name="theme-color" content="#090d16" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
@@ -17,108 +17,174 @@
   <link rel="stylesheet" href="./src/assets/styles/reader.css" />
 </head>
 <body>
-  <div id="app">
-    <!-- View 1: Library View -->
-    <main id="view-library" class="view active">
-      <div class="library-container">
-        <header class="library-header">
-          <div class="brand-badge">
-            <img src="icons/icon-192x192.png" alt="Timepass Tea Logo" class="brand-icon" width="38" height="38" />
-            <h1 class="library-title">Timepass Tea</h1>
+
+  <!-- Top Announcement Banner for Updated Completed Notes -->
+  <aside id="top-update-banner" class="top-update-banner" role="alert"></aside>
+
+  <!-- =========================================================================
+       VIEW 1: SYLLABUS & TOPIC DASHBOARD (LIBRARY VIEW)
+       ========================================================================= -->
+  <main id="view-library" class="view active" aria-label="Syllabus Library">
+    <div class="library-layout">
+      
+      <!-- Top Brand Header -->
+      <header class="library-nav-bar">
+        <div class="brand-group">
+          <div class="brand-icon-box" aria-hidden="true">Σ</div>
+          <div class="brand-titles">
+            <h1 class="app-main-title">GATE Notes Flow</h1>
+            <span class="app-sub-title">CS & DA Master Revision Hub</span>
           </div>
-          <div class="library-actions">
-            <button id="btn-toggle-theme" aria-label="Toggle Theme">
-              <i id="icon-theme" data-lucide="moon"></i>
-            </button>
+        </div>
+
+        <div class="nav-actions-group">
+          <button id="btn-theme-toggle" class="icon-button" title="Toggle Theme (Dark / Parchment / Light)" aria-label="Toggle Theme">
+            🌓
+          </button>
+        </div>
+      </header>
+
+      <!-- Stream Switcher Tabs -->
+      <nav class="stream-switch-container" aria-label="GATE Stream Switcher">
+        <button class="stream-tab-btn active" data-stream="GATE_CS">GATE Computer Science (CS)</button>
+        <button class="stream-tab-btn" data-stream="GATE_DA">GATE Data Science & AI (DA)</button>
+        <button class="stream-tab-btn" data-stream="ALL">All Streams</button>
+      </nav>
+
+      <!-- Progress Summary Widget -->
+      <section id="syllabus-progress-summary" class="progress-summary-card" aria-label="Revision Progress"></section>
+
+      <!-- Search & Filters -->
+      <section class="filter-search-container" aria-label="Search and Filter Notes">
+        <div class="search-input-wrapper">
+          <span class="search-icon-symbol" aria-hidden="true">🔍</span>
+          <input 
+            type="search" 
+            id="syllabus-search-input" 
+            class="search-input-field" 
+            placeholder="Search topics, formulas, or PYQs (e.g. Eigenvalues, Paging, Bayes)... (Ctrl+K)" 
+            autocomplete="off"
+            aria-label="Search notes"
+          />
+        </div>
+
+        <div class="filter-pills-row" role="tablist" aria-label="Topic Status Filters">
+          <button class="filter-pill-btn active" data-filter="ALL" role="tab">All Topics</button>
+          <button class="filter-pill-btn" data-filter="UNREAD" role="tab">Unread</button>
+          <button class="filter-pill-btn" data-filter="IN_PROGRESS" role="tab">In Progress</button>
+          <button class="filter-pill-btn" data-filter="COMPLETED" role="tab">Completed</button>
+          <button class="filter-pill-btn" data-filter="UPDATED" role="tab">🔄 Updated</button>
+          <button class="filter-pill-btn" data-filter="BOOKMARKED" role="tab">★ Starred</button>
+        </div>
+      </section>
+
+      <!-- Hierarchical Syllabus Container -->
+      <section id="syllabus-container" class="syllabus-container" aria-label="Subjects Tree"></section>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 2: CONTINUOUS TECHNICAL SCROLL READER
+       ========================================================================= -->
+  <section id="view-reader" class="view" aria-label="Note Reader">
+    <div class="reader-layout">
+
+      <!-- Top Reading Progress Fill Bar -->
+      <div class="reader-progress-track">
+        <div id="reader-progress-fill" class="reader-progress-fill"></div>
+      </div>
+
+      <!-- Sticky Reader App Bar -->
+      <header class="reader-sticky-header">
+        <div class="reader-header-left">
+          <button id="btn-back-library" class="btn-back-nav" aria-label="Back">
+            ⤺ Back
+          </button>
+          <div class="reader-header-title-box">
+            <h2 id="reader-header-title" class="reader-header-title">Note Title</h2>
+            <span id="reader-header-version" class="reader-header-version">v1.0</span>
           </div>
-        </header>
+        </div>
 
-        <!-- Continue Reading Card Section -->
-        <section id="continue-section"></section>
-
-        <!-- Story Catalog Grid -->
-        <section id="story-list" class="story-list"></section>
-      </div>
-    </main>
-
-    <!-- View 2: Reader View -->
-    <section id="view-reader" class="reader-view">
-      <!-- Reader Viewport & Track for Single-Page Carousel -->
-      <div id="reader-viewport" class="reader-viewport" aria-label="Story reader viewport">
-        <div id="reader-track" class="reader-track"></div>
-        <!-- Off-screen measurer for zero-line-cut dynamic pagination -->
-        <div id="reader-measurer" class="reader-measurer" aria-hidden="true"></div>
-      </div>
-
-      <!-- Boundary Notification Toast -->
-      <div id="reader-toast" class="reader-toast" role="status" aria-live="polite"></div>
-
-      <!-- Distraction-Free HUD Overlay (Auto-hidden) -->
-      <div id="hud-container">
-        <!-- Top HUD Header (Compact: Back, Title, Fullscreen, Chapters, Theme) -->
-        <header class="hud-top">
-          <div class="hud-header-content">
-            <button id="btn-back-to-library" class="btn-back-library" aria-label="Back to Library">
-              <i data-lucide="arrow-left"></i>
-              <span>Library</span>
-            </button>
-            <div id="story-header-title" class="story-header-title">Story Title</div>
-            <div class="hud-controls-group">
-              <button id="btn-fullscreen" class="hud-btn-icon" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">
-                <i id="icon-fullscreen" data-lucide="maximize"></i>
-              </button>
-              <button id="btn-open-toc" class="hud-btn-icon" aria-label="Table of Contents" title="Chapters">
-                <i data-lucide="list"></i>
-              </button>
-              <button id="btn-reader-theme" class="hud-btn-icon" aria-label="Toggle Theme" title="Toggle Theme">
-                <i data-lucide="sun-medium"></i>
-              </button>
-            </div>
+        <div class="reader-header-actions">
+          <button id="btn-mark-read" class="btn-mark-read" title="Mark as Completed">
+            <span class="icon">○</span> <span class="label">Mark as Read</span>
+          </button>
+          <button id="btn-reader-bookmark" class="icon-button" title="Star for Revision" aria-label="Bookmark Topic">
+            ☆
+          </button>
+          <button id="btn-toggle-formula-drawer" class="btn-formula-trigger" title="Quick Formula Sheet">
+            📐 Formulas
+          </button>
+          <div class="font-scaling-group" title="Adjust text size">
+            <button id="btn-font-smaller" class="btn-font-scale" aria-label="Smaller text">A−</button>
+            <button id="btn-font-larger" class="btn-font-scale" aria-label="Larger text">A+</button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <!-- Bottom HUD Controls & Progress Bar (Ergonomic thumb-accessible font scaling) -->
-        <footer class="hud-bottom">
-          <div class="hud-bottom-content">
-            <div class="hud-bottom-row">
-              <div class="hud-font-controls" aria-label="Font Size Controls">
-                <button id="btn-font-minus" class="btn-font-scale" aria-label="Decrease Font" title="Smaller Text">A−</button>
-                <button id="btn-font-plus" class="btn-font-scale" aria-label="Increase Font" title="Larger Text">A+</button>
-              </div>
-              <div class="progress-info">
-                <span id="page-progress-text">Page 1 of 1</span>
-              </div>
-            </div>
-            <input type="range" id="progress-slider" class="progress-slider" min="0" max="0" value="0" />
-          </div>
-        </footer>
-      </div>
+      <!-- Hopping Breadcrumb Navigation Trail -->
+      <nav id="reader-nav-trail" class="reader-nav-trail" aria-label="Breadcrumb Trail"></nav>
 
-      <!-- Chapter Menu Drawer (ToC) -->
-      <div id="toc-drawer" class="toc-drawer">
-        <aside class="toc-panel">
-          <div class="toc-header">
-            <h3>Chapters</h3>
-            <button id="btn-close-toc" aria-label="Close Chapters">
-              <i data-lucide="x"></i>
-            </button>
-          </div>
-          <ul id="toc-list" class="toc-list"></ul>
-        </aside>
-      </div>
-    </section>
+      <!-- In-Note Update Alert (for modified read notes) -->
+      <div id="in-note-alert-container" class="in-note-alert-container"></div>
 
-    <!-- Passphrase Decryption Modal -->
-    <div id="passphrase-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-content">
-        <h2>Enter Passphrase</h2>
-        <p>This library is encrypted for private reading. Please enter your passphrase to unlock.</p>
-        <input type="password" id="passphrase-input" placeholder="Passphrase..." autocomplete="current-password" />
-        <button id="btn-submit-passphrase" class="btn" style="width:100%;">Unlock Stories</button>
-        <p id="passphrase-error" class="error-text"></p>
+      <!-- Main Content Viewport -->
+      <article id="reader-viewport" class="reader-viewport">
+        <div id="reader-content" class="reader-content"></div>
+
+        <!-- Next / Previous Topic Bottom Nav -->
+        <nav class="reader-bottom-nav" aria-label="Adjacent Topics">
+          <button id="btn-prev-topic" class="btn-adjacent-topic">← Previous Topic</button>
+          <button id="btn-next-topic" class="btn-adjacent-topic">Next Topic →</button>
+        </nav>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SLIDE-OVER FORMULA SHEET DRAWER
+       ========================================================================= -->
+  <aside id="formula-drawer" class="formula-drawer" aria-label="Formula Cheatsheet" role="dialog" aria-modal="true">
+    <header class="formula-drawer-header">
+      <h3 class="formula-drawer-title">📐 Key Formulas Cheatsheet</h3>
+      <button class="btn-close-formula-drawer icon-button" aria-label="Close Formulas">✕</button>
+    </header>
+    <div id="formula-drawer-content" class="formula-drawer-content"></div>
+  </aside>
+
+  <!-- =========================================================================
+       UPDATES & ENHANCEMENTS MODAL
+       ========================================================================= -->
+  <div id="updates-modal" class="updates-modal" role="dialog" aria-modal="true" aria-labelledby="updates-modal-title">
+    <header class="updates-modal-header">
+      <h3 id="updates-modal-title">🔔 Note Enhancements & Updates</h3>
+      <button class="btn-close-updates-modal icon-button" aria-label="Close Modal">✕</button>
+    </header>
+    <div class="updates-list-container"></div>
+  </div>
+
+  <!-- Passphrase Unlock Modal (Encrypted Notes Protection) -->
+  <div id="passphrase-modal" class="passphrase-modal" role="dialog" aria-modal="true" aria-labelledby="passphrase-modal-title">
+    <div class="passphrase-card">
+      <div class="passphrase-badge">🔐</div>
+      <h2 id="passphrase-modal-title" class="passphrase-title">Unlock GATE Notes Flow</h2>
+      <p class="passphrase-desc">These revision notes are encrypted for secure client-side access. Enter your access key to decrypt in-memory.</p>
+      <div class="passphrase-input-group">
+        <input type="password" id="passphrase-input" class="passphrase-input" placeholder="Enter key (e.g. gate)..." autocomplete="current-password" />
+        <button id="btn-submit-passphrase" class="btn-unlock-notes">Unlock Notes</button>
       </div>
+      <p id="passphrase-error" class="passphrase-error-msg" role="alert"></p>
+      <span class="passphrase-hint">Default Access Key: <code>gate</code></span>
     </div>
   </div>
+
+  <!-- Shared Modal Overlay Backdrop -->
+  <div id="modal-overlay" class="modal-overlay" aria-hidden="true"></div>
+
+  <!-- Boundary / Action Toast Notification -->
+  <div id="app-toast" class="app-toast" role="status" aria-live="polite"></div>
 
   <script type="module" src="./src/js/app.js"></script>
 </body>

@@ -1,0 +1,415 @@
+{
+  "GATE_CS/00_General_Aptitude/aptitude.md": {
+    "version": "v1.0",
+    "contentHash": "06c474055877bc75281895b5a3c605d1da4a3a68157537f26cd901d1bd7146ac",
+    "createdAt": "2026-10-11T13:52:45.620Z",
+    "updatedAt": "2026-10-11T13:52:45.620Z",
+    "changeCount": 0
+  },
+  "GATE_CS/01_Engineering_Math/calculus.md": {
+    "version": "v1.0",
+    "contentHash": "e73e6a125a7ac62ffcdbb54b1c0a8769fd45cec236bd5bf4bedb288dcaa8fd5a",
+    "createdAt": "2026-10-11T13:52:45.637Z",
+    "updatedAt": "2026-10-11T13:52:45.637Z",
+    "changeCount": 0
+  },
+  "GATE_CS/01_Engineering_Math/discrete_math.md": {
+    "version": "v1.0",
+    "contentHash": "bc80b013273b9dcd480f13c179836f35f2b5616676cd1839104591700eda64d9",
+    "createdAt": "2026-10-11T13:52:45.654Z",
+    "updatedAt": "2026-10-11T13:52:45.654Z",
+    "changeCount": 0
+  },
+  "GATE_CS/01_Engineering_Math/linear_algebra.md": {
+    "version": "v1.0",
+    "contentHash": "35e62c675e77e30e86ef63d42fd8b8b4b11e941ca6481818daeefe255f00d6e4",
+    "createdAt": "2026-10-11T13:52:45.656Z",
+    "updatedAt": "2026-10-11T13:52:45.656Z",
+    "changeCount": 0
+  },
+  "GATE_CS/01_Engineering_Math/probability.md": {
+    "version": "v1.0",
+    "contentHash": "fc639a974c003c6f0c2e2e831c87347b530d774c432c4cfa95feedf6e55db677",
+    "createdAt": "2026-10-11T13:52:45.666Z",
+    "updatedAt": "2026-10-11T13:52:45.666Z",
+    "changeCount": 0
+  },
+  "GATE_CS/02_Digital_Logic/digital_logic.md": {
+    "version": "v1.0",
+    "contentHash": "cd5fd9679a42614f39bfe4f43e8cdefecd7a6d5faf5189148a19a59b820ca55d",
+    "createdAt": "2026-10-11T13:52:45.681Z",
+    "updatedAt": "2026-10-11T13:52:45.681Z",
+    "changeCount": 0
+  },
+  "GATE_CS/03_Computer_Organization/computer_org.md": {
+    "version": "v1.0",
+    "contentHash": "8a23a034c8f2369a346eb112a24912449672d1d032b17463d69cb898646e18c9",
+    "createdAt": "2026-10-11T13:52:45.697Z",
+    "updatedAt": "2026-10-11T13:52:45.697Z",
+    "changeCount": 0
+  },
+  "GATE_CS/04_Programming_Data_Structures/c_programming.md": {
+    "version": "v1.0",
+    "contentHash": "b3c84ce21b3cf44bd8830454b6e2d129c0cf46dd98c294dad46928140b61a39d",
+    "createdAt": "2026-10-11T13:52:45.717Z",
+    "updatedAt": "2026-10-11T13:52:45.717Z",
+    "changeCount": 0
+  },
+  "GATE_CS/04_Programming_Data_Structures/data_structures.md": {
+    "version": "v1.0",
+    "contentHash": "6c030731b25ec2cea0b5080602334449319b5fd04f320c24b7014c7bc1cb63f9",
+    "createdAt": "2026-10-11T13:52:45.734Z",
+    "updatedAt": "2026-10-11T13:52:45.734Z",
+    "changeCount": 0
+  },
+  "GATE_CS/05_Algorithms/algorithms.md": {
+    "version": "v1.0",
+    "contentHash": "cbd20de0f67b45c6ad7b23e3f6192e173f75ce50fe3c7aaf791b6986a67014bd",
+    "createdAt": "2026-10-11T13:52:45.745Z",
+    "updatedAt": "2026-10-11T13:52:45.745Z",
+    "changeCount": 0
+  },
+  "GATE_CS/05_Algorithms/algorithm_design.md": {
+    "version": "v1.0",
+    "contentHash": "1b02928daec916957e9fcec60c5786e76d645fe377959813c7211b9b298506b8",
+    "createdAt": "2026-10-11T13:52:45.757Z",
+    "updatedAt": "2026-10-11T13:52:45.757Z",
+    "changeCount": 0
+  },
+  "GATE_CS/06_Theory_of_Computation/toc.md": {
+    "version": "v1.0",
+    "contentHash": "1a45f82099a3eadd848d121204f7e9a4e3674ff4a6a6637f399781bc28c0f677",
+    "createdAt": "2026-10-11T13:52:45.785Z",
+    "updatedAt": "2026-10-11T13:52:45.785Z",
+    "changeCount": 0
+  },
+  "GATE_CS/07_Compiler_Design/compiler_design.md": {
+    "version": "v1.0",
+    "contentHash": "eee829005d071d484262db83f739fca327137a349a82b3e5c204944a606041f9",
+    "createdAt": "2026-10-11T13:52:45.799Z",
+    "updatedAt": "2026-10-11T13:52:45.799Z",
+    "changeCount": 0
+  },
+  "GATE_CS/08_Operating_Systems/os.md": {
+    "version": "v1.0",
+    "contentHash": "a9123f22baebd26ad2edc3fb0efd690f0be22ec6be01463159364e3bfd5d421c",
+    "createdAt": "2026-10-11T13:52:45.812Z",
+    "updatedAt": "2026-10-11T13:52:45.812Z",
+    "changeCount": 0
+  },
+  "GATE_CS/09_Databases/databases.md": {
+    "version": "v1.0",
+    "contentHash": "677aea7be015c57e640bf8e85eec95ee3e9033e4efa3d12b6a47c1343643213f",
+    "createdAt": "2026-10-11T13:52:45.822Z",
+    "updatedAt": "2026-10-11T13:52:45.822Z",
+    "changeCount": 0
+  },
+  "GATE_CS/10_Computer_Networks/networks.md": {
+    "version": "v1.0",
+    "contentHash": "53c86e08d3a58ed07c4f76dc1a0cf15f0fbd084104945a8c1acdc66dc9cc38b5",
+    "createdAt": "2026-10-11T13:52:45.839Z",
+    "updatedAt": "2026-10-11T13:52:45.839Z",
+    "changeCount": 0
+  },
+  "GATE_CS/README.md": {
+    "version": "v1.0",
+    "contentHash": "7dc0bb6b55eeec6e55b9beb2f36628ed8eceac03eebe480b2317bf84e9a9e53a",
+    "createdAt": "2026-10-11T13:52:45.842Z",
+    "updatedAt": "2026-10-11T13:52:45.842Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/algorithms_deep.md": {
+    "version": "v1.0",
+    "contentHash": "1bc11e98b2f419554ea2ebd4cbeff68d93785675fc16d779ac1774599d08af8e",
+    "createdAt": "2026-10-11T13:52:45.858Z",
+    "updatedAt": "2026-10-11T13:52:45.858Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/algorithm_design_deep.md": {
+    "version": "v1.0",
+    "contentHash": "3eee435168afd47804f3dd2e77ef2a1adb85c021d7f144b29d30926a0d43613e",
+    "createdAt": "2026-10-11T13:52:45.874Z",
+    "updatedAt": "2026-10-11T13:52:45.874Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/aptitude_deep.md": {
+    "version": "v1.0",
+    "contentHash": "8e13ab221d2af8ad568aeb1c2efc6548a27c9d5c5b27de1c8296d4a6b435c5f9",
+    "createdAt": "2026-10-11T13:52:45.889Z",
+    "updatedAt": "2026-10-11T13:52:45.889Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/calculus_deep.md": {
+    "version": "v1.0",
+    "contentHash": "91f8b5894430e63b760864a68b20409f5dae60ba429dc70328798eb2a9f257df",
+    "createdAt": "2026-10-11T13:52:45.903Z",
+    "updatedAt": "2026-10-11T13:52:45.903Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/compiler_design_deep.md": {
+    "version": "v1.0",
+    "contentHash": "e25d179c4df5902f4de5883f530e8d95ae685fdfc4a9ff7c20443fdae2494dd4",
+    "createdAt": "2026-10-11T13:52:45.918Z",
+    "updatedAt": "2026-10-11T13:52:45.918Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/computer_org_deep.md": {
+    "version": "v1.0",
+    "contentHash": "10494bc7e6d8436e87849a7e7b73e02c60fae58c4918d79ef80d3ce77dc676d7",
+    "createdAt": "2026-10-11T13:52:45.931Z",
+    "updatedAt": "2026-10-11T13:52:45.931Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/c_programming_deep.md": {
+    "version": "v1.0",
+    "contentHash": "8a6d4e4f698a8d30da31ea47368ccbf6a3d8066f03231b1537647f362440b5ba",
+    "createdAt": "2026-10-11T13:52:45.945Z",
+    "updatedAt": "2026-10-11T13:52:45.945Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/databases_deep.md": {
+    "version": "v1.0",
+    "contentHash": "63b563915eb7fe6fc6ae1b0c69228e7b89e09b685957c5312ca852d29baa5565",
+    "createdAt": "2026-10-11T13:52:45.958Z",
+    "updatedAt": "2026-10-11T13:52:45.958Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/data_structures_deep.md": {
+    "version": "v1.0",
+    "contentHash": "fc76fd2ad89f2e5b90d42697a0946134bbee4b1411300c79253d95123424823d",
+    "createdAt": "2026-10-11T13:52:45.970Z",
+    "updatedAt": "2026-10-11T13:52:45.970Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/digital_logic_deep.md": {
+    "version": "v1.0",
+    "contentHash": "7d3e26824bff2766712b8bd9f3fc2245b395a954b666379df0db16b415a492f5",
+    "createdAt": "2026-10-11T13:52:45.986Z",
+    "updatedAt": "2026-10-11T13:52:45.986Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/discrete_math_deep.md": {
+    "version": "v1.0",
+    "contentHash": "45f0f1b1c010681acb76c091cb1a29480cfefdd9e7fead2858dd4bf5bb4e03f2",
+    "createdAt": "2026-10-11T13:52:46.009Z",
+    "updatedAt": "2026-10-11T13:52:46.009Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/linear_algebra_deep.md": {
+    "version": "v1.0",
+    "contentHash": "5efb2c563c20baae45c74365f458c23fa1997a8c483277483aa5c030b07ecb4d",
+    "createdAt": "2026-10-11T13:52:46.023Z",
+    "updatedAt": "2026-10-11T13:52:46.023Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/networks_deep.md": {
+    "version": "v1.0",
+    "contentHash": "cd292798befc285b57d4643629582e55aa9ba55d759319b85153e809b42cb4d6",
+    "createdAt": "2026-10-11T13:52:46.036Z",
+    "updatedAt": "2026-10-11T13:52:46.036Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/os_deep.md": {
+    "version": "v1.0",
+    "contentHash": "ddf54395411f855d94eb59b35654226f880e7c7e1924204603f2b48bc2ac9c63",
+    "createdAt": "2026-10-11T13:52:46.048Z",
+    "updatedAt": "2026-10-11T13:52:46.048Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/probability_deep.md": {
+    "version": "v1.0",
+    "contentHash": "23229e99f4d4feaaa7bbd32c59558f2c1bac1f976bbd50eb8f57e3599951d967",
+    "createdAt": "2026-10-11T13:52:46.061Z",
+    "updatedAt": "2026-10-11T13:52:46.061Z",
+    "changeCount": 0
+  },
+  "GATE_CS/_deep_dives/toc_deep.md": {
+    "version": "v1.0",
+    "contentHash": "3623c23123c2f32809b7d0604a73b6ea8e7b147bd95e51b50fbdf89dc9fef559",
+    "createdAt": "2026-10-11T13:52:46.082Z",
+    "updatedAt": "2026-10-11T13:52:46.082Z",
+    "changeCount": 0
+  },
+  "GATE_DA/00_General_Aptitude/aptitude.md": {
+    "version": "v1.0",
+    "contentHash": "e2b2e726f6e5c19f1d2826d3fb56d5f04e574711a97807876c1f718a2d761d31",
+    "createdAt": "2026-10-11T13:52:46.097Z",
+    "updatedAt": "2026-10-11T13:52:46.097Z",
+    "changeCount": 0
+  },
+  "GATE_DA/01_Probability_Statistics/probability.md": {
+    "version": "v1.0",
+    "contentHash": "1ccc808def74c11d2e63a32838ada639a84773db4c7ec1dc0d66343ab00fff0f",
+    "createdAt": "2026-10-11T13:52:46.099Z",
+    "updatedAt": "2026-10-11T13:52:46.099Z",
+    "changeCount": 0
+  },
+  "GATE_DA/01_Probability_Statistics/statistics.md": {
+    "version": "v1.0",
+    "contentHash": "63425281117cdc78ffd4e0459ecc09dec4c0120d71aafc8630b0cbda0f9c2b7f",
+    "createdAt": "2026-10-11T13:52:46.111Z",
+    "updatedAt": "2026-10-11T13:52:46.111Z",
+    "changeCount": 0
+  },
+  "GATE_DA/02_Linear_Algebra/linear_algebra.md": {
+    "version": "v1.0",
+    "contentHash": "b5d0025d1b99c10b36cd8bdd48169698b6115d1eddadccb9ec853a0f0afad5f0",
+    "createdAt": "2026-10-11T13:52:46.127Z",
+    "updatedAt": "2026-10-11T13:52:46.127Z",
+    "changeCount": 0
+  },
+  "GATE_DA/03_Calculus_Optimization/calculus.md": {
+    "version": "v1.0",
+    "contentHash": "2d31a4807414daf822a9f934508dab500d063378eb1a236aaf8461fc499ecbb9",
+    "createdAt": "2026-10-11T13:52:46.144Z",
+    "updatedAt": "2026-10-11T13:52:46.144Z",
+    "changeCount": 0
+  },
+  "GATE_DA/03_Calculus_Optimization/optimization.md": {
+    "version": "v1.0",
+    "contentHash": "147730ea2345edd02419dfafa771f996817753f95c27e97498cf54488c20592a",
+    "createdAt": "2026-10-11T13:52:46.155Z",
+    "updatedAt": "2026-10-11T13:52:46.155Z",
+    "changeCount": 0
+  },
+  "GATE_DA/04_Programming_Data_Structures/algorithms.md": {
+    "version": "v1.0",
+    "contentHash": "089504a74133ebd0d72320825f0be0ffe31b0b0f6b3ed6f9da90d26c8b19f01d",
+    "createdAt": "2026-10-11T13:52:46.166Z",
+    "updatedAt": "2026-10-11T13:52:46.166Z",
+    "changeCount": 0
+  },
+  "GATE_DA/04_Programming_Data_Structures/data_structures.md": {
+    "version": "v1.0",
+    "contentHash": "c39be8eb1c1cf1ed73768ffda65fdd4ff790385dce2c0d7d0e141d14bb276086",
+    "createdAt": "2026-10-11T13:52:46.173Z",
+    "updatedAt": "2026-10-11T13:52:46.173Z",
+    "changeCount": 0
+  },
+  "GATE_DA/04_Programming_Data_Structures/python.md": {
+    "version": "v1.0",
+    "contentHash": "ff512da4e5615ed1ab863508eb4c3b34ff596a25603972fa35fa543331512c2b",
+    "createdAt": "2026-10-11T13:52:46.184Z",
+    "updatedAt": "2026-10-11T13:52:46.184Z",
+    "changeCount": 0
+  },
+  "GATE_DA/05_Databases_Warehousing/databases.md": {
+    "version": "v1.0",
+    "contentHash": "3f232ee3396dcd875e0e67eda2a22443dbaec60c2d7290620be37ce562ba9092",
+    "createdAt": "2026-10-11T13:52:46.192Z",
+    "updatedAt": "2026-10-11T13:52:46.192Z",
+    "changeCount": 0
+  },
+  "GATE_DA/05_Databases_Warehousing/data_warehousing.md": {
+    "version": "v1.0",
+    "contentHash": "6e0bca2c6bd73b44070f52a0ef7b3b06154a06eed4a5b77de13aa91c62725b81",
+    "createdAt": "2026-10-11T13:52:46.207Z",
+    "updatedAt": "2026-10-11T13:52:46.207Z",
+    "changeCount": 0
+  },
+  "GATE_DA/06_Machine_Learning/model_evaluation.md": {
+    "version": "v1.0",
+    "contentHash": "4a6211a358e860969b15f27c1bfa5b3a754189c0bb5183332edfe4e0d9b161e0",
+    "createdAt": "2026-10-11T13:52:46.220Z",
+    "updatedAt": "2026-10-11T13:52:46.220Z",
+    "changeCount": 0
+  },
+  "GATE_DA/06_Machine_Learning/supervised_learning.md": {
+    "version": "v1.0",
+    "contentHash": "4912300eda899e1aef1f121711d161f35672bf00f1011bc468d3fc5a5d5ac8a0",
+    "createdAt": "2026-10-11T13:52:46.232Z",
+    "updatedAt": "2026-10-11T13:52:46.232Z",
+    "changeCount": 0
+  },
+  "GATE_DA/06_Machine_Learning/unsupervised_learning.md": {
+    "version": "v1.0",
+    "contentHash": "b78af09299c1c73bb6d3e01c45436d4482c510158aeff1faf0009b820d5c3704",
+    "createdAt": "2026-10-11T13:52:46.243Z",
+    "updatedAt": "2026-10-11T13:52:46.243Z",
+    "changeCount": 0
+  },
+  "GATE_DA/07_Artificial_Intelligence/ai_logic.md": {
+    "version": "v1.0",
+    "contentHash": "939c8e5bf591130e73d70b760e1470b324cc99bb5ca00ca5f62c142203e45ab8",
+    "createdAt": "2026-10-11T13:52:46.254Z",
+    "updatedAt": "2026-10-11T13:52:46.254Z",
+    "changeCount": 0
+  },
+  "GATE_DA/07_Artificial_Intelligence/ai_search.md": {
+    "version": "v1.0",
+    "contentHash": "e9b3f4a1044f888c8439459539980946c3bee860c33593470dcbbdc48fea9f53",
+    "createdAt": "2026-10-11T13:52:46.263Z",
+    "updatedAt": "2026-10-11T13:52:46.263Z",
+    "changeCount": 0
+  },
+  "GATE_DA/README.md": {
+    "version": "v1.0",
+    "contentHash": "65ecabd69e1419e613744b6f0491720d504411793c02db89b325e4d4dfed99fe",
+    "createdAt": "2026-10-11T13:52:46.264Z",
+    "updatedAt": "2026-10-11T13:52:46.264Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/ai_logic_deep.md": {
+    "version": "v1.0",
+    "contentHash": "a1b3af96645d4ebb252964c552117b490470f7a0ab0d5f8953856cbd57988b34",
+    "createdAt": "2026-10-11T13:52:46.271Z",
+    "updatedAt": "2026-10-11T13:52:46.271Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/ai_search_deep.md": {
+    "version": "v1.0",
+    "contentHash": "f1c4648a730566eedc8f35cf9935e53f36d1d5a173839d3a0b2e71315f6677d8",
+    "createdAt": "2026-10-11T13:52:46.279Z",
+    "updatedAt": "2026-10-11T13:52:46.279Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/data_warehousing_deep.md": {
+    "version": "v1.0",
+    "contentHash": "3f49b358650e11bf2ca0a07e0adcbbaec0bf932e812c10ca991decac4b0cd8c6",
+    "createdAt": "2026-10-11T13:52:46.287Z",
+    "updatedAt": "2026-10-11T13:52:46.287Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/model_evaluation_deep.md": {
+    "version": "v1.0",
+    "contentHash": "5e6e4de83df49f0a077c5572776809dc41d2b8bfdd78de8e91abf8fdeb72a978",
+    "createdAt": "2026-10-11T13:52:46.297Z",
+    "updatedAt": "2026-10-11T13:52:46.297Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/optimization_deep.md": {
+    "version": "v1.0",
+    "contentHash": "d7a71c13412368f07e66d5739fcc285a0ed69c2274ff1c85cdbc7e482f0cf28c",
+    "createdAt": "2026-10-11T13:52:46.305Z",
+    "updatedAt": "2026-10-11T13:52:46.305Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/python_deep.md": {
+    "version": "v1.0",
+    "contentHash": "8155de1a4647894e218723f5d5c99b0df850fd2aad1a7de03d70d4abbb9df058",
+    "createdAt": "2026-10-11T13:52:46.315Z",
+    "updatedAt": "2026-10-11T13:52:46.315Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/statistics_deep.md": {
+    "version": "v1.0",
+    "contentHash": "ed8c2c2e9220e71a9d4100c5e52524d721b3bd2f37fe3ffdd11d69394bfc64f1",
+    "createdAt": "2026-10-11T13:52:46.327Z",
+    "updatedAt": "2026-10-11T13:52:46.327Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/supervised_learning_deep.md": {
+    "version": "v1.0",
+    "contentHash": "1bb9389842bd0aefa5edd3491ac555d4cfd1f297447cb8eae3cdb9747c06b6d8",
+    "createdAt": "2026-10-11T13:52:46.337Z",
+    "updatedAt": "2026-10-11T13:52:46.337Z",
+    "changeCount": 0
+  },
+  "GATE_DA/_deep_dives/unsupervised_learning_deep.md": {
+    "version": "v1.0",
+    "contentHash": "5fa4f6da23cc4f3aab2caf64744761dcf91666fa55182aedaf32dc915c2ba2ce",
+    "createdAt": "2026-10-11T13:52:46.347Z",
+    "updatedAt": "2026-10-11T13:52:46.347Z",
+    "changeCount": 0
+  }
+}

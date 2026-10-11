@@ -1,408 +1,549 @@
-/* Reader View Styles */
-.reader-view {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  display: none;
+@import './variables.css';
+
+/* =========================================================================
+   READER VIEW CONTAINER
+   ========================================================================= */
+.reader-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background-color: var(--bg-color);
 }
 
-.reader-view.active {
-  display: flex;
-}
-
-/* Reader Viewport (Full surface touch & gesture handling) */
-.reader-viewport {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  touch-action: pan-y pinch-zoom;
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: default;
-  background-color: var(--bg-color);
-}
-
-/* Horizontal Page Carousel Track */
-.reader-track {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.24s cubic-bezier(0.2, 0.9, 0.4, 1);
-  will-change: transform;
-}
-
-/* Single Page Slide: Exactly 1 page on screen at any time, never two columns side-by-side */
-.reader-page {
-  flex: 0 0 100%;
-  width: 100%;
-  min-width: 100%;
-  max-width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: calc(var(--sat) + 26px) max(22px, var(--sal)) calc(var(--sab) + 34px) max(22px, var(--sar));
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  overflow: hidden;
-}
-
-/* Page Body Container: Sized to max 680px, strictly containing exact fitted text */
-.page-body {
-  width: 100%;
-  max-width: 680px;
-  height: 100%;
-  box-sizing: border-box;
-  font-family: var(--font-reader);
-  font-size: var(--font-size-current);
-  line-height: var(--line-height);
-  letter-spacing: var(--letter-spacing);
-  color: var(--text-main);
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.page-body h1, .page-body h2, .page-body h3,
-.reader-measurer h1, .reader-measurer h2, .reader-measurer h3 {
-  font-family: var(--font-family);
-  margin-top: 0.2em;
-  margin-bottom: 0.5em;
-  line-height: 1.25;
-  color: var(--text-main);
-  flex-shrink: 0;
-}
-
-.page-body p,
-.reader-measurer p {
-  margin-top: 0;
-  margin-bottom: 1.15em;
-  text-indent: 1.2em;
-  flex-shrink: 0;
-}
-
-.page-body p.continuation,
-.reader-measurer p.continuation {
-  text-indent: 0;
-}
-
-.page-body p:first-of-type,
-.reader-measurer p:first-of-type {
-  text-indent: 0;
-}
-
-.page-body blockquote,
-.reader-measurer blockquote {
-  margin: 0.8em 0;
-  padding-left: 1em;
-  border-left: 3px solid var(--text-muted);
-  font-style: italic;
-  flex-shrink: 0;
-}
-
-.page-body img,
-.reader-measurer img {
-  max-width: 100%;
-  max-height: 50vh;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-/* Hidden DOM Measurer for dynamic client pagination */
-.reader-measurer {
-  position: absolute;
-  top: -99999px;
-  left: -99999px;
-  width: 100%;
-  max-width: 680px;
-  box-sizing: border-box;
-  font-family: var(--font-reader);
-  font-size: var(--font-size-current);
-  line-height: var(--line-height);
-  letter-spacing: var(--letter-spacing);
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* Ephemeral Toast for Boundaries (e.g. End of Story / Beginning of Story) */
-.reader-toast {
-  position: absolute;
-  bottom: calc(var(--sab) + 36px);
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  z-index: 40;
-}
-
-.reader-toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* Distraction-Free HUD Overlay (Auto-hidden, toggled by center tap) */
-.hud-top, .hud-bottom {
-  position: absolute;
+/* Top Horizontal Reading Progress Track */
+.reader-progress-track {
+  position: fixed;
+  top: 0;
   left: 0;
   width: 100%;
-  background: var(--hud-bg);
-  backdrop-filter: blur(10px);
-  border-color: var(--border-color);
-  z-index: 20;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-  pointer-events: none;
-  opacity: 0;
+  height: 3px;
+  background: transparent;
+  z-index: 400;
 }
 
-.hud-top {
+.reader-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #38bdf8, #0284c7);
+  transition: width 0.1s linear;
+}
+
+/* =========================================================================
+   STICKY READER TOP HEADER
+   ========================================================================= */
+.reader-sticky-header {
+  position: sticky;
   top: 0;
+  width: 100%;
+  height: var(--header-height);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
-  padding: calc(var(--sat) + 8px) 16px 10px;
-  transform: translateY(-100%);
-}
-
-.hud-bottom {
-  bottom: 0;
-  border-top: 1px solid var(--border-color);
-  padding: 12px 16px calc(var(--sab) + 12px);
-  transform: translateY(100%);
-}
-
-/* Visible HUD state */
-.hud-visible .hud-top {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.hud-visible .hud-bottom {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.hud-header-content {
-  max-width: 860px;
-  margin: 0 auto;
+  backdrop-filter: blur(8px);
+  z-index: 300;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  width: 100%;
+  padding: 0 16px;
 }
 
-/* Prominent, uncluttered Back to Library Button */
-.btn-back-library {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  min-height: 38px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  display: inline-flex;
+.reader-header-left {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  color: var(--text-main);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
-.story-header-title {
+.btn-back-nav {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.btn-back-nav:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-color);
+}
+
+.reader-header-title-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.reader-header-title {
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: center;
-  flex: 1;
-  min-width: 0;
-  padding: 0 6px;
 }
 
-.hud-controls-group {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.hud-controls-group button,
-.hud-btn-icon {
-  min-height: 38px;
-  min-width: 38px;
-  width: 38px;
-  height: 38px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  background-color: var(--bg-card);
+.reader-header-version {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  color: var(--text-main);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
-.hud-bottom-content {
-  max-width: 800px;
-  margin: 0 auto;
+.reader-header-actions {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 
-.hud-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+.btn-mark-read {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
-.hud-font-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background-color: var(--bg-card);
-  padding: 2px 4px;
+.btn-mark-read:hover {
+  border-color: var(--success-color);
+  color: var(--text-main);
+}
+
+.btn-mark-read.is-completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.btn-formula-trigger {
+  padding: 8px 12px;
   border-radius: 8px;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--accent-color);
+}
+
+.btn-formula-trigger:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-color);
+}
+
+.font-scaling-group {
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .btn-font-scale {
-  min-height: 32px;
-  min-width: 36px;
-  padding: 4px 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  background-color: transparent;
-  border: none;
-  border-radius: 6px;
-  color: var(--text-main);
-  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 0;
+}
+
+.btn-font-scale:hover {
+  background: var(--bg-card-hover);
+}
+
+/* =========================================================================
+   NAVIGATION BREADCRUMB TRAIL (HOPPING)
+   ========================================================================= */
+.reader-nav-trail {
+  max-width: var(--max-reader-width);
+  margin: 10px auto 0 auto;
+  padding: 0 16px;
+  display: none;
+  align-items: center;
+  width: 100%;
+}
+
+.trail-pill-group {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s ease;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
 }
 
-.btn-font-scale:active {
-  background-color: var(--border-color);
-}
-
-.progress-info {
-  display: flex;
-  align-items: center;
-  font-size: 0.95rem;
+.trail-label {
   color: var(--text-muted);
+}
+
+.btn-trail-jump {
+  color: var(--accent-color);
   font-weight: 600;
+  padding: 0;
+  border-radius: 0;
 }
 
-.progress-slider {
+.btn-trail-jump:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================================
+   IN-NOTE UPDATE ALERT CALLOUT
+   ========================================================================= */
+.in-note-alert-container {
+  max-width: var(--max-reader-width);
+  margin: 16px auto 0 auto;
+  padding: 0 16px;
   width: 100%;
-  accent-color: var(--accent-color);
-  height: 28px;
-  cursor: pointer;
 }
 
-/* Chapter Menu Drawer (ToC) */
-.toc-drawer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  z-index: 50;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-
-.toc-drawer.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.toc-panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 85%;
-  max-width: 380px;
-  height: 100%;
-  background: var(--bg-card);
-  border-right: 1px solid var(--border-color);
-  transform: translateX(-100%);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  padding: calc(var(--sat) + 20px) 16px calc(var(--sab) + 20px);
-}
-
-.toc-drawer.open .toc-panel {
-  transform: translateX(0);
-}
-
-.toc-header {
+.in-note-update-alert {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--warning-color);
+  border-radius: 10px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.in-note-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.in-note-alert-icon {
+  font-size: 1.3rem;
+}
+
+.in-note-alert-text {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.in-note-alert-text code {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.btn-ack-update {
+  background: var(--warning-color);
+  color: #000000;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.btn-ack-update:hover {
+  opacity: 0.9;
+}
+
+/* =========================================================================
+   NOTE CONTENT BODY & TYPOGRAPHY
+   ========================================================================= */
+.reader-viewport {
+  width: 100%;
+  flex: 1;
+  padding: 24px 16px 80px 16px;
+}
+
+.reader-content {
+  max-width: var(--max-reader-width);
+  margin: 0 auto;
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
+  color: var(--text-main);
+}
+
+/* Headings */
+.reader-content h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0 0 18px 0;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.reader-content h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 36px 0 16px 0;
+  color: var(--text-main);
+  position: relative;
+}
+
+.reader-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 24px 0 12px 0;
+  color: var(--text-main);
+}
+
+.heading-anchor-hash {
+  opacity: 0.3;
+  margin-right: 6px;
+  user-select: none;
+}
+
+.reader-content h2:hover .heading-anchor-hash,
+.reader-content h3:hover .heading-anchor-hash {
+  opacity: 0.8;
+  color: var(--accent-color);
+}
+
+/* Paragraphs, Lists & Dividers */
+.reader-content p {
   margin-bottom: 16px;
 }
 
-.toc-header h3 {
-  font-size: 1.4rem;
+.reader-content ul, .reader-content ol {
+  margin: 0 0 20px 24px;
+}
+
+.reader-content li {
+  margin-bottom: 8px;
+}
+
+.reader-content hr {
+  border: none;
+  height: 1px;
+  background: var(--border-color);
+  margin: 36px 0;
+}
+
+/* Links */
+.reader-content a {
+  color: var(--accent-color);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+
+.reader-content a:hover {
+  opacity: 0.8;
+}
+
+/* Blockquotes & Callout Cards */
+.callout-card {
+  border-radius: 10px;
+  margin: 20px 0;
+  padding: 14px 18px;
+  border-left: 4px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.callout-header {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.callout-body p {
+  margin-bottom: 0;
+  font-size: 0.95em;
+}
+
+.callout-syllabus {
+  border-left-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+}
+.callout-syllabus .callout-header { color: #38bdf8; }
+
+.callout-note {
+  border-left-color: #a855f7;
+  background: rgba(168, 85, 247, 0.08);
+}
+.callout-note .callout-header { color: #a855f7; }
+
+.callout-warning, .callout-trap {
+  border-left-color: var(--warning-color);
+  background: rgba(245, 158, 11, 0.08);
+}
+.callout-warning .callout-header, .callout-trap .callout-header { color: var(--warning-color); }
+
+/* Responsive Tables */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 20px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.reader-content table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.95em;
+}
+
+.reader-content th, .reader-content td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reader-content th {
+  background: var(--bg-surface);
   font-weight: 700;
 }
 
-.toc-list {
-  list-style: none;
-  overflow-y: auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.reader-content tr:last-child td {
+  border-bottom: none;
 }
 
-.toc-item {
-  padding: 14px 12px;
+/* =========================================================================
+   KATEX MATH FORMULAS
+   ========================================================================= */
+.katex-display-block {
+  margin: 20px 0;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.katex-inline-formula {
+  padding: 0 3px;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   ACTIVE-RECALL PYQ REVEALS
+   ========================================================================= */
+.pyq-reveal-item {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.pyq-reveal-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.pyq-reveal-btn {
+  padding: 10px 14px;
   cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: background 0.15s ease;
+  font-size: 0.9rem;
+  font-weight: 600;
   display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-color);
+  user-select: none;
+}
+
+.pyq-reveal-btn:hover {
+  background: var(--bg-card);
+}
+
+.pyq-solution-body {
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  font-size: 0.95em;
+  color: var(--text-main);
+}
+
+/* =========================================================================
+   CODE BLOCKS
+   ========================================================================= */
+.code-block-container {
+  background: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.code-block-header {
+  padding: 8px 14px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
-.toc-item:active, .toc-item.active {
-  background: var(--bg-color);
-  color: var(--accent-color);
+.code-lang-tag {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
   font-weight: 700;
+  color: var(--text-muted);
 }
 
-.toc-item.level-2 {
-  padding-left: 24px;
-  font-size: 1.0rem;
-  color: var(--text-muted);
+.btn-copy-code {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.code-pre {
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+/* =========================================================================
+   READER FOOTER ADJACENT TOPIC BUTTONS
+   ========================================================================= */
+.reader-bottom-nav {
+  max-width: var(--max-reader-width);
+  margin: 40px auto 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.btn-adjacent-topic {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.btn-adjacent-topic:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.btn-adjacent-topic:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
